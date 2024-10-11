@@ -57,6 +57,7 @@ private:
 
     void Update(DX::StepTimer const& timer);
     void UpdatePlay(DX::StepTimer const& timer, const float& elapsedTime, const float& totalTime, const Keyboard::State& keyboard, const Mouse::State& mouse);
+    Vector3 ProcessInput(const Keyboard::State& kb, const Mouse::State& mouse, Vector3& m_cameraPos, Dog&);
     void Render();
     void RenderTitle();
     void RenderScore();

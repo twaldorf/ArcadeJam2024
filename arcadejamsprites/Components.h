@@ -3,6 +3,8 @@
 using namespace DirectX::SimpleMath;
 #include <unordered_map>
 
+
+// not yet in use, should be in a different branch
 struct Entity {
 	__int32 id;
 };

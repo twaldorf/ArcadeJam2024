@@ -23,14 +23,11 @@ namespace
 }
 
 /* TODO:
-// 1. Add leaderboard (text, score, text input, save score)
-// 2. Add more enemies (random spawn system)
-// 3. Bound player to single screen
-// 4. Add sound effects and music
-// 5. Add start screen etc
-6. Fix hitbox on ball
-7. Add ball boost from octopus
-8. Add animations to octo, dog
+Add more enemies (random spawn system)
+Bound player to single screen
+Add sound effects and music
+Fix hitbox on ball
+Add animations to octo, dog
 
 */
 
@@ -88,7 +85,7 @@ void Game::Initialize(HWND window, int width, int height)
 }
 
 #pragma region Frame Update
-// Executes the basic game loop.
+// execute the basic game loop
 void Game::Tick()
 {
     m_timer.Tick([&]()
@@ -99,12 +96,7 @@ void Game::Tick()
     Render();
 }
 
-void Game::UpdatePlay(DX::StepTimer const& timer, const float &elapsedTime, const float &totalTime, const Keyboard::State& kb, const Mouse::State& mouse) {
-    if (!D.alive) {
-        Mode = Score;
-        all_scores.push_back({ SCORE, NAME });
-        NAME = GenerateName(totalTime * 1.5f, totalTime);
-    }
+Vector3 Game::ProcessInput(const Keyboard::State& kb, const Mouse::State& mouse, Vector3& m_cameraPos, Dog& D) {
 
     if (kb.Home)
     {
@@ -140,20 +132,32 @@ void Game::UpdatePlay(DX::StepTimer const& timer, const float &elapsedTime, cons
         if (kb.PageDown || kb.X)
             move.z -= 1.f;
 
+    return move;
+}
+
+void Game::UpdatePlay(DX::StepTimer const& timer, const float &elapsedTime, const float &totalTime, const Keyboard::State& kb, const Mouse::State& mouse) {
+
+    if (!D.alive) {
+        Mode = Score;
+        all_scores.push_back({ SCORE, NAME });
+        NAME = GenerateName(totalTime * 1.5f, totalTime);
+    }
+
+    // prepare for player movement
+    Vector3 move = ProcessInput(kb, mouse, m_cameraPos, D);
     Quaternion q = Quaternion::CreateFromYawPitchRoll(0.f, 0.f, 0.f);
-
     move = Vector3::Transform(move, q);
-
     move *= MOVEMENT_GAIN;
-
     Vector3 newPos = m_cameraPos + move;
-    //m_cameraPos += move;
 
+    // check for terrain and crab collisions
     if (!W.checkForCollisions(newPos)) {
+        // move player in sync with camera
         m_cameraPos = newPos;
         D.pos = Vector2(newPos.x, newPos.y);
     }
 
+    // fire projectile
     if (mouse.leftButton && W.projectiles.size() < 1) {
         Vector2 to = m_cameraPos - Vector2(m_cameraPos.x + mouse.x - windowWidth / 2, m_cameraPos.y + mouse.y - windowHeight / 2);
         W.createBall(m_cameraPos, to * 4.f);
@@ -180,6 +184,7 @@ void Game::UpdatePlay(DX::StepTimer const& timer, const float &elapsedTime, cons
         }
     }
 
+    // process crab and player updates
     for (Animal* entity : W.animals) {
         if (entity->alive) {
             entity->update();
@@ -209,16 +214,14 @@ void Game::UpdatePlay(DX::StepTimer const& timer, const float &elapsedTime, cons
     }
 }
 
-// Updates the world.
+// Update the world
 void Game::Update(DX::StepTimer const& timer)
 {
     PIXBeginEvent(PIX_COLOR_DEFAULT, L"Update");
 
-
     float elapsedTime = float(timer.GetElapsedSeconds());
     float totalTime = float(timer.GetTotalSeconds());
 
-    // TODO: Add your game logic here.
     elapsedTime;
 
     auto kb = m_keyboard->GetState();
@@ -227,21 +230,21 @@ void Game::Update(DX::StepTimer const& timer)
     }
 
     auto mouse = m_mouse->GetState();
-
     
-
+    // swap between game modes
     if (Mode == Play) {
+        // tick main play mode
         UpdatePlay(timer, elapsedTime, totalTime, kb, mouse);
     } else if (Mode == Score) {
+        // TODO: Move to input processor
         if (kb.Enter) {
             D.restart();
             Mode = Title;
         }
-
-    }
-    else if (Mode == Title) {
+    } else if (Mode == Title) {
         World W();
         SCORE = 0;
+        // TODO: Move to input processor
         if (kb.Enter) {
             Mode = Play;
             D.restart();
@@ -330,12 +333,12 @@ void Game::Render()
     auto commandList = m_deviceResources->GetCommandList();
     PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Render"); 
 
-    // TODO: Add your rendering code here.
     Vector3 offset = { static_cast<float>(windowWidth / 2), static_cast<float>(windowHeight / 2), 0.f };
 
     ID3D12DescriptorHeap* heaps[] = { m_resourceDescriptors->Heap() };
     commandList->SetDescriptorHeaps(static_cast<UINT>(std::size(heaps)), heaps);
 
+    // begin drawing sprite batch
     m_spriteBatch->Begin(commandList);
     
     for (const auto &tile : W.tiles) {
@@ -366,6 +369,7 @@ void Game::Render()
         GetTextureSize(m_texture_cat.Get()),
         Vector2(windowWidth / 2.f, windowHeight / 2.f), &D.rect, Colors::White, 0.f, Vector2(0, 0), 4.f);
 
+    // draw HP
     for (int i = 0; i < D.hp; ++i) {
         RECT hp_rect{ 0, 32, 32, 64 };
         m_spriteBatch->Draw(m_resourceDescriptors->GetGpuHandle(Descriptors::Cat),
@@ -383,7 +387,7 @@ void Game::Render()
         RenderTitle();
     }
 
-    // end sprite
+    // finish drawing
     m_spriteBatch->End();
 
     PIXEndEvent(commandList);
@@ -562,15 +566,12 @@ void Game::CreateDeviceDependentResources()
         m_deviceResources->GetCommandQueue());
 
     uploadResourcesFinished.wait();
-
-    // TODO: Initialize device dependent objects here (independent of window size).
     
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    // TODO: Initialize windows-size dependent objects here.
     auto viewport = m_deviceResources->GetScreenViewport();
     m_spriteBatch->SetViewport(viewport);
 
@@ -583,9 +584,6 @@ void Game::CreateWindowSizeDependentResources()
 
 void Game::OnDeviceLost()
 {
-    // TODO: Add Direct3D resource cleanup here.
-
-    // If using the DirectX Tool Kit for DX12, uncomment this line:
     m_graphicsMemory.reset();
     m_texture_cat.Reset();
     m_texture_sand.Reset();

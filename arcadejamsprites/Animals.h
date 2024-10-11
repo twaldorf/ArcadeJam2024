@@ -26,7 +26,7 @@ public:
 
 	void update() {
 		if (alive == false) {
-			// delete this;
+			delete this;
 		}
 
 		pos.y += static_cast<float>(cos(pos.x) * 2.f);

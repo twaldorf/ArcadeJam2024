@@ -84,7 +84,7 @@ public:
     std::unique_ptr<Octoc> octo;
 
     World() {
-        // generateChunkAt(0,0);
+        generateChunkAt(-1100,-500);
         newCrabs(40);
         
         octo = std::make_unique<Octoc>();
