@@ -511,27 +511,27 @@ void Game::CreateDeviceDependentResources()
     resourceUpload.Begin();
 
     DX::ThrowIfFailed(
-        CreateWICTextureFromFile(device, resourceUpload, L"dog.png",
+        CreateWICTextureFromFile(device, resourceUpload, L"./resources/dog.png",
             m_texture_cat.ReleaseAndGetAddressOf()));
 
     DX::ThrowIfFailed(
-        CreateWICTextureFromFile(device, resourceUpload, L"desert.png",
+        CreateWICTextureFromFile(device, resourceUpload, L"./resources/desert.png",
             m_texture_sand.ReleaseAndGetAddressOf()));
 
     DX::ThrowIfFailed(
-        CreateWICTextureFromFile(device, resourceUpload, L"ball.png",
+        CreateWICTextureFromFile(device, resourceUpload, L"./resources/ball.png",
             m_texture_ball.ReleaseAndGetAddressOf()));
 
     DX::ThrowIfFailed(
-        CreateWICTextureFromFile(device, resourceUpload, L"crab.png",
+        CreateWICTextureFromFile(device, resourceUpload, L"./resources/crab.png",
             m_texture_crab.ReleaseAndGetAddressOf()));
 
     DX::ThrowIfFailed(
-        CreateWICTextureFromFile(device, resourceUpload, L"octo.png",
+        CreateWICTextureFromFile(device, resourceUpload, L"./resources/octo.png",
             m_texture_octo.ReleaseAndGetAddressOf()));
 
     m_font = std::make_unique<SpriteFont>(device, resourceUpload,
-        L"myfileb.spritefont",
+        L"./resources/myfileb.spritefont",
         m_resourceDescriptors->GetCpuHandle(Descriptors::MyFont),
         m_resourceDescriptors->GetGpuHandle(Descriptors::MyFont));
 

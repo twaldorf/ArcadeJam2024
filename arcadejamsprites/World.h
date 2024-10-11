@@ -59,7 +59,6 @@ public:
             vel.Normalize(velocity);
             velocity *= SPEED * 100.f * 10.f;
             baselineY = posi.y;
-            
         }
 
         void update(const float& delta) {
@@ -84,7 +83,7 @@ public:
     std::unique_ptr<Octoc> octo;
 
     World() {
-        generateChunkAt(-1100,-500);
+        generateChunkAt(-1100,0);
         newCrabs(40);
         
         octo = std::make_unique<Octoc>();

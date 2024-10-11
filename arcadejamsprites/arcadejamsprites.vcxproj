@@ -208,7 +208,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Animals.h" />
-    <ClInclude Include="Components.h" />
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="Descriptors.h" />
     <ClInclude Include="Game.h" />
