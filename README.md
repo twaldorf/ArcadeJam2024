@@ -1,5 +1,5 @@
 # Rufus Game
-A 2D game built with DXTK to dip my toe into DX12 for Indie City Arcade Jam 2024. 
+A 2D game built from the DirectX12 Toolkit to dip my toe into DX12. Made during Indie City Arcade Jam 2024.
 
 ## Previews
 ![build](./gifs/rufus1.gif)
